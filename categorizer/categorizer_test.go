@@ -4,12 +4,6 @@ import (
 	"testing"
 )
 
-func logFailedIfErrorExists(err error, t **testing.T, funcName string) {
-	if err != nil {
-		(*t).Errorf("expected no error return from %v. Got: %v", funcName, err)
-	}
-}
-
 func TestAppendGameToGameSliceShouldWorkWithTwoItems(t *testing.T) {
 	var err error
 	categorizer := Categorizer{}
@@ -79,5 +73,11 @@ func TestFormattedStringsShouldWork(t *testing.T) {
 		if gameInfo == "" {
 			t.Error("expected game information to return from GetStringSliceWithGameScoreResults")
 		}
+	}
+}
+
+func logFailedIfErrorExists(err error, t **testing.T, funcName string) {
+	if err != nil {
+		(*t).Errorf("expected no error return from %v. Got: %v", funcName, err)
 	}
 }
