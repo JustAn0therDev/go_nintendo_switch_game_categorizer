@@ -56,7 +56,7 @@ func (categorizerInstance *Categorizer) GetSortedStringSliceWithGameScoreResults
 
 	for i := 0; i < gameSliceSize; i++ {
 	 	formattedInformationAboutEachGame = append(formattedInformationAboutEachGame, 
-			fmt.Sprintf("%v's score: %v", categorizerInstance.GamesSlice[i].GameName, categorizerInstance.GamesSlice[i].FinalScore))
+			fmt.Sprintf("%v - %v", i + 1, categorizerInstance.GamesSlice[i].GameName))
 	}
 
 	return formattedInformationAboutEachGame, nil
@@ -85,7 +85,7 @@ func sortGamesSlice(gamesSlice []game) []game {
 
 func stringExistsInSlice(slice []string, s string) bool {
 	sliceSize := len(slice)
-	
+
 	for i := 0; i < sliceSize; i++ {
 		if (slice[i] == s)  {
 			return true;
