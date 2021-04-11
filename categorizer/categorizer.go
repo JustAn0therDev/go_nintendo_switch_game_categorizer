@@ -52,7 +52,7 @@ func (categorizerInstance *Categorizer) GetSortedStringSliceWithGameScoreResults
 		errors.New("there is no game list in the instance. Please set at least one game by calling 'AppendGameToGameSlice' before calling this function")
 	}
 
-	categorizerInstance.GamesSlice = sortGamesSlice(categorizerInstance.GamesSlice)
+	categorizerInstance.GamesSlice = getSortedGamesSlice(categorizerInstance.GamesSlice)
 
 	for i := 0; i < gameSliceSize; i++ {
 	 	formattedInformationAboutEachGame = append(formattedInformationAboutEachGame, 
@@ -62,7 +62,8 @@ func (categorizerInstance *Categorizer) GetSortedStringSliceWithGameScoreResults
 	return formattedInformationAboutEachGame, nil
 }
 
-func sortGamesSlice(gamesSlice []game) []game {
+// Returns the sorted version of a gameSlice pass in as parameter
+func getSortedGamesSlice(gamesSlice []game) []game {
 	var gameNameHistory []string
 	gameSliceSize := len(gamesSlice)
 	var sortedGamesSlice []game
@@ -83,6 +84,7 @@ func sortGamesSlice(gamesSlice []game) []game {
 	return sortedGamesSlice
 }
 
+// Check if string exists in slice
 func stringExistsInSlice(slice []string, s string) bool {
 	sliceSize := len(slice)
 

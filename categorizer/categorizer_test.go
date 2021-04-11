@@ -87,7 +87,7 @@ func TestGamesSliceSorting(t *testing.T) {
 	logFailedIfErrorExists(err, &t, "AppendGameToGameSlice")
 
 	categorizer.CalculateAllGamesScore()
-	sortedGameSlice := sortGamesSlice(categorizer.GamesSlice)
+	sortedGameSlice := getSortedGamesSlice(categorizer.GamesSlice)
 
 	if sortedGameSlice[0].GameName != "Pokemon Shield" {
 		t.Errorf("expected 'Pokemon Shield' to be the first game, got %v", sortedGameSlice[0].GameName)
