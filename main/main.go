@@ -58,7 +58,7 @@ func main() {
 	}
 
 	categorizerInstance.CalculateAllGamesScore()
-	gamesInformation, err := categorizerInstance.GetStringSliceWithGameScoreResults()
+	gamesInformation, err := categorizerInstance.GetSortedStringSliceWithGameScoreResults()
 
 	if err != nil {
 		log.Fatal(err)

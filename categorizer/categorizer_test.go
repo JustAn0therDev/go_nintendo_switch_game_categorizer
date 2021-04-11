@@ -65,14 +65,32 @@ func TestFormattedStringsShouldWork(t *testing.T) {
 	logFailedIfErrorExists(err, &t, "AppendGameToGameSlice")
 
 	categorizer.CalculateAllGamesScore()
-	formattedStringsSlice, err := categorizer.GetStringSliceWithGameScoreResults()
+	formattedStringsSlice, err := categorizer.GetSortedStringSliceWithGameScoreResults()
 
-	logFailedIfErrorExists(err, &t, "GetStringSliceWithGameScoreResults")
+	logFailedIfErrorExists(err, &t, "GetSortedStringSliceWithGameScoreResults")
 
 	for _, gameInfo := range formattedStringsSlice {
 		if gameInfo == "" {
-			t.Error("expected game information to return from GetStringSliceWithGameScoreResults")
+			t.Error("expected game information to return from GetSortedStringSliceWithGameScoreResults")
 		}
+	}
+}
+
+func TestGamesSliceSorting(t *testing.T) {
+	var err error
+	categorizer := Categorizer{}
+
+	err = categorizer.AppendGameToGameSlice("The Legend of Zelda", true, 10, 5)
+	logFailedIfErrorExists(err, &t, "AppendGameToGameSlice")
+
+	err = categorizer.AppendGameToGameSlice("Pokemon Shield", false, 8.5, 5)
+	logFailedIfErrorExists(err, &t, "AppendGameToGameSlice")
+
+	categorizer.CalculateAllGamesScore()
+	sortedGameSlice := sortGamesSlice(categorizer.GamesSlice)
+
+	if sortedGameSlice[0].GameName != "Pokemon Shield" {
+		t.Errorf("expected 'Pokemon Shield' to be the first game, got %v", sortedGameSlice[0].GameName)
 	}
 }
 

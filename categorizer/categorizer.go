@@ -43,7 +43,7 @@ func (categorizerInstance *Categorizer) CalculateAllGamesScore() {
 }
 
 // Returns a list of formatted strings containing an ""information breakdown"" of each game in the GamesSlice property.
-func (categorizerInstance *Categorizer) GetStringSliceWithGameScoreResults() ([]string, error) {
+func (categorizerInstance *Categorizer) GetSortedStringSliceWithGameScoreResults() ([]string, error) {
 	gameSliceSize := len(categorizerInstance.GamesSlice)
 	var formattedInformationAboutEachGame []string
 
@@ -52,12 +52,47 @@ func (categorizerInstance *Categorizer) GetStringSliceWithGameScoreResults() ([]
 		errors.New("there is no game list in the instance. Please set at least one game by calling 'AppendGameToGameSlice' before calling this function")
 	}
 
+	categorizerInstance.GamesSlice = sortGamesSlice(categorizerInstance.GamesSlice)
+
 	for i := 0; i < gameSliceSize; i++ {
 	 	formattedInformationAboutEachGame = append(formattedInformationAboutEachGame, 
 			fmt.Sprintf("%v's score: %v", categorizerInstance.GamesSlice[i].GameName, categorizerInstance.GamesSlice[i].FinalScore))
 	}
 
 	return formattedInformationAboutEachGame, nil
+}
+
+func sortGamesSlice(gamesSlice []game) []game {
+	var gameNameHistory []string
+	gameSliceSize := len(gamesSlice)
+	var sortedGamesSlice []game
+	var currentGameWithBiggestScore = game{}
+
+	for len(sortedGamesSlice) < gameSliceSize {
+		for i := 0; i < gameSliceSize; i++ {
+			if gamesSlice[i].FinalScore > currentGameWithBiggestScore.FinalScore && !stringExistsInSlice(gameNameHistory, gamesSlice[i].GameName) {
+				currentGameWithBiggestScore = gamesSlice[i]
+				gameNameHistory = append(gameNameHistory, currentGameWithBiggestScore.GameName)
+			}
+		}
+
+		sortedGamesSlice = append(sortedGamesSlice, currentGameWithBiggestScore)
+		currentGameWithBiggestScore = game{}
+	}
+
+	return sortedGamesSlice
+}
+
+func stringExistsInSlice(slice []string, s string) bool {
+	sliceSize := len(slice)
+	
+	for i := 0; i < sliceSize; i++ {
+		if (slice[i] == s)  {
+			return true;
+		}
+	}
+
+	return false
 }
 
 // Calculates the score for the current game instance
