@@ -2,12 +2,12 @@ package categorizer
 
 import (
 	"fmt"
+	"log"
 )
 
-
 type Categorizer struct {
-	gamesSplit []game
-	numberOfGames int
+	GamesSplit []game
+	NumberOfGames int
 }
 
 type game struct {
@@ -18,43 +18,52 @@ type game struct {
 	FinalScore float32
 }
 
-func (categorizerInstance *Categorizer) AskForNumberOfGames() {
-	fmt.Print("Insert the number of games: ")
-	fmt.Scanln(&categorizerInstance.numberOfGames)
+// Set the NumberOfGames property of the Categorizer instance
+func (categorizerInstance *Categorizer) SetNumberOfGames(numberOfGames int) {
+	categorizerInstance.NumberOfGames = numberOfGames
 }
 
-func (categorizerInstance *Categorizer) AskForGamesName() {
-	var gameName string
-	var playedBefore bool
-	var medianScoreInReviewSites float32
-	var howLongWillTheGameBePlayed uint16
+// Asks for each property in the Game struct for a value from 
+// STDIN then sets the game.
+func (categorizerInstance *Categorizer) AppendGameToGameSlice(gameName string, playedBefore bool, medianScoreInReviewSites float32, howLongWillTheGameBePlayed uint16) {
+	game := game{
+		GameName: gameName,
+		PlayedBefore: playedBefore, 
+		MedianScoreInReviewSites: medianScoreInReviewSites, 
+		AmountOfTimeTheGameWillBePlayerFromOneToFive: howLongWillTheGameBePlayed}
 
-	for i := 0; i < categorizerInstance.numberOfGames; i++ {
-		fmt.Printf("Current game: %v\n", i + 1)
+	categorizerInstance.GamesSplit = append(categorizerInstance.GamesSplit, game)
+}
 
-		fmt.Print("Insert the name of the game (without spaces): ")
-		fmt.Scanln(&gameName)
-
-		fmt.Print("Have you played this game before (1/0)? ")
-		fmt.Scanln(&playedBefore)
-
-		fmt.Print("What is the median score in review sites for this game? ")
-		fmt.Scanln(&medianScoreInReviewSites)
-
-		fmt.Print("For how long will you play the game (from one to five)? ")
-		fmt.Scanln(&howLongWillTheGameBePlayed)
-
-		game := game{
-			GameName: gameName,
-			PlayedBefore: playedBefore, 
-			MedianScoreInReviewSites: medianScoreInReviewSites, 
-			AmountOfTimeTheGameWillBePlayerFromOneToFive: howLongWillTheGameBePlayed}
-
-		categorizerInstance.gamesSplit = append(categorizerInstance.gamesSplit, categorizerInstance.getGameScoreCalculated(&game))
+// Calculates the score for each game inside the GamesSplit slice.
+func (categorizerInstance *Categorizer) CalculateAllGamesScore() {
+	gameSplitSize := len(categorizerInstance.GamesSplit)
+	for i := 0; i < gameSplitSize; i++ {
+		categorizerInstance.GamesSplit[i].CalculateGameScore()
 	}
 }
 
-func (categorizerInstance *Categorizer) getGameScoreCalculated(currentGame *game) game {
+// Prints the results to STDOUT.
+// If the GamesSplit slice is not present or does not have more than 0 items, 
+// log.Fatalf is called.
+func (categorizerInstance *Categorizer) ReturnFormattedStringsForEachGameAndTheirResults() []string {
+	gameSplitSize := len(categorizerInstance.GamesSplit)
+	formattedInformationAboutEachGame := make([]string, gameSplitSize)
+
+	if gameSplitSize <= 0 {
+		log.Fatalf("there is no game list in the instance. Please set at least one game by calling 'AppendGameToGameSlice' before calling this function")
+	}
+
+	for i := 0; i < gameSplitSize; i++ {
+	 	formattedInformationAboutEachGame = append(formattedInformationAboutEachGame, 
+			fmt.Sprintf("%v's score: %v", categorizerInstance.GamesSplit[i].GameName, categorizerInstance.GamesSplit[i].FinalScore))
+	}
+
+	return formattedInformationAboutEachGame
+}
+
+// Calculates the score for the current game instance
+func (currentGame *game) CalculateGameScore() {
 	var total float32
 
 	if currentGame.PlayedBefore {
@@ -66,12 +75,4 @@ func (categorizerInstance *Categorizer) getGameScoreCalculated(currentGame *game
 	total += float32(currentGame.AmountOfTimeTheGameWillBePlayerFromOneToFive)
 
 	currentGame.FinalScore = total
-
-	return *currentGame
-}
-
-func (categorizerInstance *Categorizer) PrintAllGameScores() {
-	for i := 0; i < len(categorizerInstance.gamesSplit); i++ {
-		fmt.Printf("%v's score: %v\n", categorizerInstance.gamesSplit[i].GameName, categorizerInstance.gamesSplit[i].FinalScore)
-	}
 }
