@@ -2,16 +2,28 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
+	"runtime"
 
 	"github.com/JustAn0therDev/go_switch_game_relevance_categorizer/categorizer"
 )
 
-func clearTerminalBuffer() {
-	cmd := exec.Command("clear")
-	cmd.Stdout = os.Stdout
-	cmd.Run()
+var terminalBufferMap = make(map[string]func())
+
+func init() {
+	terminalBufferMap["linux"] = func () {
+		cmd := exec.Command("clear")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+
+	terminalBufferMap["windows"] = func () {
+		cmd := exec.Command("cmd", "/c", "cls")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
 }
 
 func main() {
@@ -26,9 +38,8 @@ func main() {
 	fmt.Print("Insert the number of games to compare: ")
 	fmt.Scanln(&numberOfGames)
 
-	categorizerInstance.SetNumberOfGames(numberOfGames)
-
 	for i := 0; i < numberOfGames; i++ {
+		terminalBufferMap[runtime.GOOS]()
 		fmt.Printf("Current game: %v\n", i + 1)
 	
 		fmt.Print("Insert the name of the game (without spaces): ")
@@ -44,11 +55,14 @@ func main() {
 		fmt.Scanln(&howLongWillTheGameBePlayed)
 
 		categorizerInstance.AppendGameToGameSlice(gameName, playedBefore, medianScoreInReviewSites, howLongWillTheGameBePlayed)
-		clearTerminalBuffer()
 	}
 
 	categorizerInstance.CalculateAllGamesScore()
-	gamesInformation := categorizerInstance.ReturnFormattedStringsForEachGameAndTheirResults()
+	gamesInformation, err := categorizerInstance.GetStringSliceWithGameScoreResults()
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for _, game := range gamesInformation {
 		fmt.Println(game)
